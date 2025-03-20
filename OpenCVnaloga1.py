@@ -39,9 +39,15 @@ def obdelaj_sliko_s_skatlami(slika, sirina_skatle, visina_skatle, barva_koze) ->
 
 def prestej_piklse_z_barvo_koze(slika, barva_koze) -> int:
     '''Prestej število pikslov z barvo kože v škatli.'''
-    # Določitev spodnje in zgornje meje za barvo kože v BGR prostoru
     spodnja_meja = np.array(barva_koze[0], dtype=np.uint8)
     zgornja_meja = np.array(barva_koze[1], dtype=np.uint8)
+
+    maska = cv.inRange(slika, spodnja_meja, zgornja_meja)
+
+    stevilo_pikslov_koze = np.sum(maska > 0)
+
+    return stevilo_pikslov_koze
+    pass
 
 
 def doloci_barvo_koze(slika, levo_zgoraj, desno_spodaj) -> tuple:
