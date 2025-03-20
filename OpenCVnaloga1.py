@@ -63,18 +63,4 @@ def doloci_barvo_koze(slika, levo_zgoraj, desno_spodaj) -> tuple:
 
 
 if __name__ == '__main__':
-    # Pripravi kamero
-
-    # Zajami prvo sliko iz kamere
-
-    # Izračunamo barvo kože na prvi sliki
-
-    # Zajemaj slike iz kamere in jih obdeluj
-
-    # Označi območja (škatle), kjer se nahaja obraz (kako je prepuščeno vaši domišljiji)
-    # Vprašanje 1: Kako iz števila pikslov iz vsake škatle določiti celotno območje obraza (Floodfill)?
-    # Vprašanje 2: Kako prešteti število ljudi?
-
-    # Kako velikost prebirne škatle vpliva na hitrost algoritma in točnost detekcije? Poigrajte se s parametroma velikost_skatle
-    # in ne pozabite, da ni nujno da je škatla kvadratna.
     pass
