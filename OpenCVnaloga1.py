@@ -53,7 +53,13 @@ def prestej_piklse_z_barvo_koze(slika, barva_koze) -> int:
 def doloci_barvo_koze(slika, levo_zgoraj, desno_spodaj) -> tuple:
     '''Določimo meje barve kože na podlagi izbranega območja v sliki.'''
 
-    pass
+    izrez = slika[levo_zgoraj[1]:desno_spodaj[1], levo_zgoraj[0]:desno_spodaj[0]]
+    povprecje_bgr = np.mean(izrez, axis=(0, 1))
+
+    spodnja_meja = np.maximum(povprecje_bgr - 20, 0)
+    zgornja_meja = np.minimum(povprecje_bgr + 20, 255)
+
+    return (spodnja_meja.astype(np.uint8), zgornja_meja.astype(np.uint8))
 
 
 if __name__ == '__main__':
