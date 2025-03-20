@@ -63,4 +63,49 @@ def doloci_barvo_koze(slika, levo_zgoraj, desno_spodaj) -> tuple:
 
 
 if __name__ == '__main__':
-    pass
+    cap = cv.VideoCapture(0)  # Kamera 0 je običajno privzeta kamera
+    if not cap.isOpened():
+        print("Napaka pri odpiranju kamere.")
+        exit()
+
+    # Nastavitev velikosti slike
+    sirina, visina = 320, 240
+    cap.set(3, sirina)
+    cap.set(4, visina)
+
+    # Zajemi prvo sliko iz kamere
+    ret, slika = cap.read()
+    if not ret:
+        print("Napaka pri zajemu prve slike.")
+        exit()
+
+    # Določimo območje za barvo kože (izberite primerno območje na prvi sliki)
+    levo_zgoraj = (50, 50)
+    desno_spodaj = (150, 150)
+
+    # Izračunamo barvo kože na prvi sliki
+    barva_koze = doloci_barvo_koze(slika, levo_zgoraj, desno_spodaj)
+
+    # Zajemaj slike iz kamere in jih obdeluj
+    while True:
+        ret, slika = cap.read()
+        if not ret:
+            break
+
+        # Preprosta obdelava slike
+        skatle = obdelaj_sliko_s_skatlami(slika, 60, 80, barva_koze)
+
+        # Označi območja (škatle), kjer se nahaja obraz
+        for (x, y, w, h) in skatle:
+            cv.rectangle(slika, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Prikaz rezultatov
+        cv.putText(slika, "Press 'q' to exit", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv.imshow("Detekcija obraza", slika)
+
+        # Pritisnite 'q' za izhod
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv.destroyAllWindows()
