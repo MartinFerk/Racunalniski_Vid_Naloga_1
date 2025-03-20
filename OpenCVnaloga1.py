@@ -51,9 +51,8 @@ def prestej_piklse_z_barvo_koze(slika, barva_koze) -> int:
 
 
 def doloci_barvo_koze(slika, levo_zgoraj, desno_spodaj) -> tuple:
-    '''Ta funkcija se kliče zgolj 1x na prvi sliki iz kamere.
-    Vrne barvo kože v območju ki ga definira oklepajoča škatla (levo_zgoraj, desno_spodaj).
-      Način izračuna je prepuščen vaši domišljiji.'''
+    '''Določimo meje barve kože na podlagi izbranega območja v sliki.'''
+
     pass
 
 
