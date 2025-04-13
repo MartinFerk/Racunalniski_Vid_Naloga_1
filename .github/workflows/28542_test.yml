@@ -1,15 +1,16 @@
-name: 28542 Test
+name: Test Workflow
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   preveri-teste:
     runs-on: self-hosted
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Preveri testno skripto
         run: |
@@ -29,8 +30,8 @@ jobs:
     needs: preveri-teste
     runs-on: self-hosted
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Prenesi artefakt napake
         uses: actions/download-artifact@v4
