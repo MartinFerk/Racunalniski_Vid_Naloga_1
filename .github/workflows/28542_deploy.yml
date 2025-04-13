@@ -17,7 +17,7 @@ jobs:
         run: |
           if [ ! -f "tests/run_tests.sh" ]; then
             echo "No test scripts found" > napaka.txt
-            exit 1  # Fail the job if test script is not found
+            exit 1 
           fi
           echo "Test scripts found" > napaka.txt
 
@@ -43,14 +43,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: error
-          path: ./  # Path where artifact will be downloaded
+          path: ./ 
 
       - name: Check for errors
         run: |
           if [ -f "./napaka.txt" ]; then
-            if grep -q "No test scripts found" ./napaka.txt; then  # Look for the error message
+            if grep -q "No test scripts found" ./napaka.txt; then 
               cat ./napaka.txt
-              exit 1  # Only fail the job if the error message is found
+              exit 1 
             else
               echo "Test scripts found, continuing with deployment."
             fi
@@ -60,7 +60,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-repo:${{ matrix.tag }} .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-repo:${{ matrix.tag }} .
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
