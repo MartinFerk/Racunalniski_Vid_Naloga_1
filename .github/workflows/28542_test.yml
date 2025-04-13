@@ -19,7 +19,7 @@ jobs:
           if [ ! -f "./tests/run_tests.sh" ]; then
             echo "Test script not found!" >&2
             echo "Test script not found!" > napaka.txt
-            exit 1
+            exit 1  # Prekine izvajanje, če ni testne skripte
           fi
           echo "error=" >> $GITHUB_OUTPUT
 
@@ -39,9 +39,9 @@ jobs:
           path: napaka.txt  # Naloži napaka.txt, če obstaja
 
   run-tests:
-    needs: check-tests
+    needs: check-tests  # Ta job je odvisen od check-tests job-a
     runs-on: self-hosted
-    if: ${{ needs.check-tests.result == 'success' }}
+    if: ${{ needs.check-tests.result == 'success' }}  # Izvede se samo, če je check-tests uspešen
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -49,18 +49,18 @@ jobs:
       - name: Download potential error file
         uses: actions/download-artifact@v4
         with:
-          name: test-error
+          name: test-error  # Prenesi artefakt, če je bil naložen
           path: ./error_check
 
       - name: Check for previous errors
         run: |
           if [ -f ./error_check/napaka.txt ]; then
             echo "Found previous error, aborting tests"
-            cat ./error_check/napaka.txt
-            exit 1
+            cat ./error_check/napaka.txt  # Izpis napake, če obstaja
+            exit 1  # Prekine izvajanje testov
           fi
 
       - name: Run tests
         run: |
-          chmod +x ./tests/run_tests.sh
-          ./tests/run_tests.sh
+          chmod +x ./tests/run_tests.sh  # Daj dovoljenja za izvajanje skripte
+          ./tests/run_tests.sh  # Zaženi testno skripto
