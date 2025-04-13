@@ -25,3 +25,39 @@ jobs:
         with:
           name: error
           path: napaka.txt  # Upload napaka.txt as an artifact
+
+  run-tests:
+    runs-on: [self-hosted, linux]
+    needs: check-tests  # This ensures the second job runs only if the first job is successful
+    if: success()  # Run the second job only if the first job is successful
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Load error artifact (if exists)
+        uses: actions/download-artifact@v4
+        with:
+          name: error
+          path: ./  # Path where artifact will be downloaded
+
+      - name: Check for errors
+        run: |
+          if [ -f "./napaka.txt" ]; then
+            if grep -q "No test scripts found" ./napaka.txt; then  # Look for the error message
+              cat ./napaka.txt
+              exit 1  # Fail the job if the test scripts were not found
+            else
+              echo "Test scripts found, continuing with the tests."
+            fi
+          else
+            echo "No napaka.txt file found, continuing."
+          fi
+
+      - name: Run the tests
+        run: |
+          if [ -f "tests/run_tests.sh" ]; then
+            ./tests/run_tests.sh  # Execute the test script
+          else
+            echo "Test script does not exist, skipping tests."
+            exit 1
+          fi

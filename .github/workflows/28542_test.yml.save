@@ -1,0 +1,27 @@
+name: Test Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-tests:
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check for test scripts
+        run: |
+          if [ ! -f "tests/run_tests.sh" ]; then
+            echo "No test scripts found" > napaka.txt
+            exit 1 
+          fi
+          echo "Test scripts found" > napaka.txt
+
+      - name: Always upload artifact (napaka.txt)
+        uses: actions/upload-artifact@v4
+        with:
+          name: error
+          path: napaka.txt 
