@@ -20,6 +20,7 @@ jobs:
           fi
         continue-on-error: false
         id: check_tests
+
       - name: Upload error if tests not found
         if: failure()
         uses: actions/upload-artifact@v4

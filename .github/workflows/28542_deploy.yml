@@ -29,12 +29,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: error
-          path: .
+          path: ./error_artifacts
 
       - name: Check for errors
         run: |
-          if [ -f "napaka.txt" ]; then
-            cat napaka.txt
+          if [ -f "./error_artifacts/napaka.txt" ]; then
+            cat ./error_artifacts/napaka.txt
             exit 1
           fi
 
