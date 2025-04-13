@@ -33,7 +33,7 @@ jobs:
     if: success()
     strategy:
       matrix:
-        os: [ubuntu-latest, centos:8]
+        os: [ubuntu-latest]
         tag: [latest, v1.0, v2.0]
     steps:
       - name: Checkout code
