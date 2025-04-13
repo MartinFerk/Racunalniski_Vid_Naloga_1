@@ -1,26 +1,43 @@
-name: 28542 Deploy
+name: Deploy to DockerHub
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Test Project"]
+    types:
+      - completed
 
 jobs:
-  build-and-push:
-    runs-on: self-hosted
-    needs: [28542 Test]
-    if: ${{ success() }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+  deploy:
+    runs-on: [self-hosted, linux]
+    needs: check-tests
+    if: success()
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Load error artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: error
+          path: .
+
+      - name: Check for errors
+        run: |
+          if [ -f "napaka.txt" ]; then
+            cat napaka.txt
+            exit 1
+          fi
 
       - name: Build Docker image
-        run: docker build -t yourdockerhubuser/yourapp:latest .
+        run: |
+          docker build -t my-image .
 
       - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Push Docker image
-        run: docker push yourdockerhubuser/yourapp:latest
+      - name: Push Docker image to DockerHub
+        run: |
+          docker push my-image
