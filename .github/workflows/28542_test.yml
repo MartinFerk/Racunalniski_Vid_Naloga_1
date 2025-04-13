@@ -1,53 +1,58 @@
-name: Test Workflow
+name: 28542 Test
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  preveri-teste:
+  check-tests:
     runs-on: self-hosted
+    outputs:
+      error: ${{ steps.check.outputs.error }}
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Preveri testno skripto
+      - name: Check for test scripts
+        id: check
         run: |
           if [ ! -f "./tests/run_tests.sh" ]; then
-            echo "Ni testne skripte!" > napaka.txt
+            echo "Test script not found!" >&2
+            echo "Test script not found!" > napaka.txt
             exit 1
           fi
+          echo "error=" >> $GITHUB_OUTPUT
 
-      - name: Shranjevanje napake
+      - name: Upload error artifact
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: napaka
+          name: test-error
           path: napaka.txt
 
-  testi:
-    needs: preveri-teste
+  run-tests:
+    needs: check-tests
     runs-on: self-hosted
+    if: ${{ needs.check-tests.result == 'success' }}
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Prenesi artefakt napake
-        uses: actions/download-artifact@v4
+      - name: Download potential error file
+        uses: actions/download-artifact@v3
         with:
-          name: napaka
-          path: ./artefakt
+          name: test-error
+          path: ./error_check
 
-      - name: Preveri napako
+      - name: Check for previous errors
         run: |
-          if [ -f ./artefakt/napaka.txt ]; then
-            echo "❌ Napaka:"
-            cat ./artefakt/napaka.txt
+          if [ -f ./error_check/napaka.txt ]; then
+            echo "Found previous error, aborting tests"
+            cat ./error_check/napaka.txt
             exit 1
           fi
 
-      - name: Poženi teste
+      - name: Run tests
         run: |
           chmod +x ./tests/run_tests.sh
           ./tests/run_tests.sh

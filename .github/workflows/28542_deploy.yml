@@ -1,34 +1,26 @@
-name: Deploy Workflow
+name: 28542 Deploy
 
 on:
-  workflow_run:
-    workflows: ["Test Workflow"]
-    types:
-      - completed
+  push:
+    branches: [main]
 
 jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
+  build-and-push:
+    runs-on: self-hosted
+    needs: [28542 Test]
+    if: ${{ success() }}
     strategy:
       matrix:
-        python-version: [3.8, 3.9]
+        os: [ubuntu-latest]
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }} .
-      
+        run: docker build -t yourdockerhubuser/yourapp:latest .
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
       - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}
+        run: docker push yourdockerhubuser/yourapp:latest
