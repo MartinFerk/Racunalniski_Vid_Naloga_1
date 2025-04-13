@@ -22,21 +22,21 @@ jobs:
             exit 1
           fi
           echo "error=" >> $GITHUB_OUTPUT
-- name: Debug - Preveri napako pred nalaganjem artefakta
-  run: |
-    ls -alh ./  # Izpiše vse datoteke v trenutni mapi, da preveriš, ali napaka.txt obstaja
-    if [ -f "napaka.txt" ]; then
-      echo "Napaka datoteka obstaja!" 
-    else
-      echo "Napaka datoteka ne obstaja!"
-    fi
+      - name: Debug - Preveri napako pred nalaganjem artefakta
+        run: |
+          ls -alh ./  # Izpiše vse datoteke v trenutni mapi, da preveriš, ali napaka.txt obstaja
+            if [ -f "napaka.txt" ]; then
+              echo "Napaka datoteka obstaja!" 
+            else
+              echo "Napaka datoteka ne obstaja!"
+            fi
 
-  - name: Upload error artifact
-  if: failure()  # Preveri, če je bila napaka
-  uses: actions/upload-artifact@v4
-  with:
-    name: test-error
-    path: napaka.txt
+      - name: Upload error artifact
+        if: failure()  # Preveri, če je bila napaka
+        uses: actions/upload-artifact@v4
+        with:
+        name: test-error
+        path: napaka.txt
 
   run-tests:
     needs: check-tests
