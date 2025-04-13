@@ -32,16 +32,16 @@ jobs:
             echo "Napaka datoteka ne obstaja!"
           fi
 
-      - name: Upload error artifact
+      - name: Upload error artifact (always)
         uses: actions/upload-artifact@v4
         with:
           name: test-error
           path: napaka.txt  # Naloži napaka.txt, če obstaja
 
   run-tests:
-    needs: check-tests  # Ta job je odvisen od check-tests job-a
+    needs: check-tests
     runs-on: self-hosted
-    if: ${{ needs.check-tests.result == 'success' }}  # Izvede se samo, če je check-tests uspešen
+    if: ${{ needs.check-tests.result == 'success' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -49,7 +49,7 @@ jobs:
       - name: Download potential error file
         uses: actions/download-artifact@v4
         with:
-          name: test-error  # Prenesi artefakt, če je bil naložen
+          name: test-error
           path: ./error_check
 
       - name: Check for previous errors
@@ -62,5 +62,5 @@ jobs:
 
       - name: Run tests
         run: |
-          chmod +x ./tests/run_tests.sh  # Daj dovoljenja za izvajanje skripte
+          chmod +x ./tests/run_tests.sh
           ./tests/run_tests.sh  # Zaženi testno skripto
