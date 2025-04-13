@@ -33,11 +33,10 @@ jobs:
           fi
 
       - name: Upload error artifact
-        if: failure()  # Preveri, če je bila napaka
         uses: actions/upload-artifact@v4
         with:
-          name: test-error  # Popravljeno: pravilna indentacija za `name`
-          path: napaka.txt
+          name: test-error
+          path: napaka.txt  # Naloži napaka.txt, če obstaja
 
   run-tests:
     needs: check-tests
