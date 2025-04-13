@@ -1,0 +1,52 @@
+name: 28542 Test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  preveri-teste:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Preveri testno skripto
+        run: |
+          if [ ! -f "./tests/run_tests.sh" ]; then
+            echo "Ni testne skripte!" > napaka.txt
+            exit 1
+          fi
+
+      - name: Shranjevanje napake
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: napaka
+          path: napaka.txt
+
+  testi:
+    needs: preveri-teste
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prenesi artefakt napake
+        uses: actions/download-artifact@v4
+        with:
+          name: napaka
+          path: ./artefakt
+
+      - name: Preveri napako
+        run: |
+          if [ -f ./artefakt/napaka.txt ]; then
+            echo "❌ Napaka:"
+            cat ./artefakt/napaka.txt
+            exit 1
+          fi
+
+      - name: Poženi teste
+        run: |
+          chmod +x ./tests/run_tests.sh
+          ./tests/run_tests.sh
