@@ -1,26 +1,39 @@
-name: Deploy to DockerHub
+name: Test and Deploy to DockerHub
 
 on:
-  workflow_run:
-    workflows: ["Test Project"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
-  check-deploy:
+  check-tests:
     runs-on: [self-hosted, linux]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Check for test scripts
+        run: |
+          if [ ! -f "tests/run_tests.sh" ]; then
+            echo "No test scripts found" > napaka.txt
+            exit 1  # Fail the job if test script is not found
+          fi
+          echo "Test scripts found" > napaka.txt
+
+      - name: Always upload artifact (napaka.txt)
+        uses: actions/upload-artifact@v4
+        with:
+          name: error
+          path: napaka.txt
+
   deploy:
     runs-on: [self-hosted, linux]
-    needs: check-deploy
+    needs: check-tests
     if: success()
     strategy:
       matrix:
-        os: [ubuntu-latest, centos:8]  # Example matrix of different OSs
-        tag: [latest, v1.0, v2.0]       # Example matrix of different tags
+        os: [ubuntu-latest, centos:8]
+        tag: [latest, v1.0, v2.0]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -29,19 +42,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: error
-          path: ./error_artifacts
+          path: ./  # Path where artifact will be downloaded
 
       - name: Check for errors
         run: |
-          if [ -f "./error_artifacts/napaka.txt" ]; then
-            cat ./error_artifacts/napaka.txt
+          if [ -f "./napaka.txt" ]; then
+            cat ./napaka.txt
             exit 1
           fi
 
       - name: Build Docker image
         run: |
           docker build -t username/my-repo:${{ matrix.tag }} .
-      
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:

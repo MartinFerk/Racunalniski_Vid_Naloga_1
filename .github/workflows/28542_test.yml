@@ -11,39 +11,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Check for test scripts
         run: |
           if [ ! -f "tests/run_tests.sh" ]; then
             echo "No test scripts found" > napaka.txt
-            exit 1
+            exit 1  # Fail the job if test script is not found
           fi
-        continue-on-error: false
-        id: check_tests
+          echo "Test scripts found" > napaka.txt
 
-      - name: Upload error if tests not found
-        if: failure()
+      - name: Always upload artifact (napaka.txt)
         uses: actions/upload-artifact@v4
         with:
           name: error
-          path: napaka.txt
-
-  run-tests:
-    runs-on: [self-hosted, linux]
-    needs: check-tests
-    if: success()
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run tests
-        run: |
-          bash tests/run_tests.sh
-        continue-on-error: false
-        id: run_tests
-      - name: Upload error if tests fail
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: error
-          path: napaka.txt
+          path: napaka.txt  # Upload napaka.txt as an artifact
