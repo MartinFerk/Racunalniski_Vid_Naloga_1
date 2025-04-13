@@ -69,4 +69,4 @@ jobs:
 
       - name: Push Docker image to DockerHub
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-repo:${{ matrix.tag }}            
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-repo:${{ matrix.tag }}            
