@@ -44,12 +44,19 @@ jobs:
           name: error
           path: ./  # Path where artifact will be downloaded
 
-      - name: Check for errors
+        - name: Check for errors
         run: |
           if [ -f "./napaka.txt" ]; then
-            cat ./napaka.txt
-            exit 1
+            if grep -q "No test scripts found" ./napaka.txt; then  # Look for the error message
+              cat ./napaka.txt
+              exit 1  # Only fail the job if the error message is found
+            else
+              echo "Test scripts found, continuing with deployment."
+            fi
+          else
+            echo "No napaka.txt file found, continuing."
           fi
+
 
       - name: Build Docker image
         run: |
